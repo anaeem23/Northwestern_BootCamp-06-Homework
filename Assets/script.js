@@ -6,6 +6,7 @@ var wind = $(".wind");
 var humidity = $(".humidity");
 var uv = $(".UV");
 var data = [];
+var listGroup = $(".list-group")
 
 var day1img = $(".day1img");
 var day2img = $(".day2img");
@@ -44,13 +45,22 @@ submit.on("click", function (event) {
   cityLocal = city.val();
   getWeather2();
   console.log(cityLocal);
+
+  addList()
+
+  document.querySelector('form').reset();
 });
 
 function addInfo() {
+
+  // Add Current Info
   cityName.text(data.city.name);
   temp.text(`Temp: ${data.list[0].main.temp}`);
   wind.text(`Wind: ${data.list[0].wind.speed}`);
   humidity.text(`Humidity: ${data.list[0].main.humidity}`);
+
+
+  // Add 5-day Forcast
 
   for (i = 0; i < data.list.length; i++) {
 
@@ -72,4 +82,33 @@ function addInfo() {
 
     }
   }
+
+
+
+  
 }
+
+function addList() {
+
+  var list = $('<li class = "list-group-item">')
+  list.text(city.val())
+
+  listGroup.append(list)
+
+}
+
+$(".list-group").on("click", function(event) {
+
+
+  console.log(document.querySelectorAll(".active").length>0)
+
+  if (document.querySelectorAll(".active").length>0) {
+    $(".active").toggleClass("active")
+  }
+  
+  $(event.target).toggleClass("active")
+
+  city.val($(event.target).text())
+  getWeather2()
+})
+
