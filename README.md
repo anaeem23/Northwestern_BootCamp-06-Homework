@@ -32,4 +32,7 @@ THEN I am again presented with current and future conditions for that city
 
 URL: https://anaeem23.github.io/Northwestern_BootCamp-06-Homework/
 
+Showcase of App: 
+![Gif of APP](./Assets/Showcase%20of%20App.gif)
+
 
