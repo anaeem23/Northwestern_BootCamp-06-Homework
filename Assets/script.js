@@ -6,7 +6,8 @@ var wind = $(".wind");
 var humidity = $(".humidity");
 var uv = $(".UV");
 var data = [];
-var listGroup = $(".list-group")
+var listGroup = $(".list-group");
+var storedPlaces = [];
 
 var day1img = $("#day1img");
 var day2img = $("#day2img");
@@ -26,12 +27,14 @@ var day3title = $(".day3title");
 var day4title = $(".day4title");
 var day5title = $(".day5title");
 
+GetListStorage();
+
 weatherURL =
   "https://api.openweathermap.org/data/2.5/weather?q=London&units=imperial&appid=50332c7d87d04bc3530b2e5889d6c590";
 weatherURL2 = `https://api.openweathermap.org/data/2.5/forecast?q=chicago&units=imperial&appid=50332c7d87d04bc3530b2e5889d6c590`;
 var apiKey = "50332c7d87d04bc3530b2e5889d6c590";
 var weatherURL4 = "https://api.openweathermap.org/data/2.5/forecast?";
-weatherURL5 = "https://api.openweathermap.org/data/2.5/onecall?"
+weatherURL5 = "https://api.openweathermap.org/data/2.5/onecall?";
 
 function getWeather2() {
   var requestObj = {
@@ -42,23 +45,27 @@ function getWeather2() {
   $.ajax(requestObj).done(function (response) {
     console.log(response);
     data = response;
-    getWeather3(data)
-    
+    getWeather3(data);
   });
 }
 
 function getWeather3() {
-  console.log(data)
+  console.log(data);
   var requestObj = {
     url: weatherURL5,
-    data: { lat:data.city.coord.lat, lon:data.city.coord.lon, units: "imperial", appid: `${apiKey}` },
+    data: {
+      lat: data.city.coord.lat,
+      lon: data.city.coord.lon,
+      units: "imperial",
+      appid: `${apiKey}`,
+    },
   };
 
   $.ajax(requestObj).done(function (response) {
     console.log(response);
     data1 = response;
-    addInfo(data,data1);
-});
+    addInfo(data, data1);
+  });
 }
 
 submit.on("click", function (event) {
@@ -68,133 +75,132 @@ submit.on("click", function (event) {
   getWeather2();
   console.log(cityLocal);
 
-  addList()
+  addList();
 
-  document.querySelector('form').reset();
+  document.querySelector("form").reset();
 });
 
 function addInfo() {
+  // Save to storage
 
   // Add Current Info
-  cityName.text(data.city.name);
+  cityName.text(`${data.city.name} ${data.list[0].dt_txt}`);
   temp.text(`Temp: ${data.list[0].main.temp} F`);
   wind.text(`Wind: ${data.list[0].wind.speed} mph`);
   humidity.text(`Humidity: ${data.list[0].main.humidity} %`);
-  uv.text(`UV: ${data1.current.uvi}`)
+  uv.text(`UV: ${data1.current.uvi}`);
 
   if (data1.current.uvi <= 2) {
-    uv.css("background-color", "green")
-  } else if (2< data1.current.uvi <= 5) {
-    uv.css("background-color", "yellow")
+    uv.css("background-color", "green");
+  } else if (2 < data1.current.uvi <= 5) {
+    uv.css("background-color", "yellow");
   } else {
-    uv.css("background-color", "red")
-
+    uv.css("background-color", "red");
   }
 
-
   // Add 5-day Forcast
-  
-  if (document.querySelectorAll(".card-img-top-1").length>0) {
-    for (i=1;i<6;i++) {
-    $(`.card-img-top-${i}`).remove()
-  
-}}
 
-console.log(document.querySelectorAll(".card-img-top-1").length)
+  if (document.querySelectorAll(".card-img-top-1").length > 0) {
+    for (i = 1; i < 6; i++) {
+      $(`.card-img-top-${i}`).remove();
+    }
+  }
+
+  console.log(document.querySelectorAll(".card-img-top-1").length);
   for (i = 0; i < data.list.length; i++) {
-
-  
-
-
-    
     if (data.list[i].dt === data.list[0].dt) {
       day1text.text(`
       Temp: ${data.list[i].main.temp} F
       Wind: ${data.list[i].wind.speed} mph
-      Humidity: ${data.list[i].main.humidity} %`
+      Humidity: ${data.list[i].main.humidity} %`);
+
+      day1img.prepend(
+        `<img src="https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png" class = "card-img-top-1"/>`
       );
-      
 
-      day1img.prepend(`<img src="https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png" class = "card-img-top-1"/>`)
-    
-      day1title.text(data.list[i].dt_txt)
-
-
-    } else if (data.list[i].dt === data.list[0].dt + 86400*1) {
-        day2text.text(`
+      day1title.text(data.list[i].dt_txt);
+    } else if (data.list[i].dt === data.list[0].dt + 86400 * 1) {
+      day2text.text(`
         Temp: ${data.list[i].main.temp} F
         Wind: ${data.list[i].wind.speed} mph
-        Humidity: ${data.list[i].main.humidity} %`
-        );
+        Humidity: ${data.list[i].main.humidity} %`);
 
-        day2img.prepend(`<img src="https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png" class = "card-img-top-2"/>`)
+      day2img.prepend(
+        `<img src="https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png" class = "card-img-top-2"/>`
+      );
 
-        day2title.text(data.list[i].dt_txt)
-
-    } else if (data.list[i].dt === data.list[0].dt + 86400*2) {
-        day3text.text(`
+      day2title.text(data.list[i].dt_txt);
+    } else if (data.list[i].dt === data.list[0].dt + 86400 * 2) {
+      day3text.text(`
         Temp: ${data.list[i].main.temp} F
         Wind: ${data.list[i].wind.speed} mph
-        Humidity: ${data.list[i].main.humidity} %`
-        );
+        Humidity: ${data.list[i].main.humidity} %`);
 
-        day3img.prepend(`<img src="https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png" class = "card-img-top-3"/>`)
+      day3img.prepend(
+        `<img src="https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png" class = "card-img-top-3"/>`
+      );
 
-        day3title.text(data.list[i].dt_txt)
-
-    } else if (data.list[i].dt === data.list[0].dt + 86400*3) {
-        day4text.text(`
+      day3title.text(data.list[i].dt_txt);
+    } else if (data.list[i].dt === data.list[0].dt + 86400 * 3) {
+      day4text.text(`
         Temp: ${data.list[i].main.temp} F
         Wind: ${data.list[i].wind.speed} mph
-        Humidity: ${data.list[i].main.humidity} %`
-        );
+        Humidity: ${data.list[i].main.humidity} %`);
 
-        day4img.prepend(`<img src="https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png" class = "card-img-top-4"/>`)
+      day4img.prepend(
+        `<img src="https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png" class = "card-img-top-4"/>`
+      );
 
-        day4title.text(data.list[i].dt_txt)
-
-    } else if (data.list[i].dt === data.list[0].dt + 86400*4) {
-
+      day4title.text(data.list[i].dt_txt);
+    } else if (data.list[i].dt === data.list[0].dt + 86400 * 4) {
       day5text.text(`
       Temp: ${data.list[i].main.temp} F
       Wind: ${data.list[i].wind.speed} mph
-      Humidity: ${data.list[i].main.humidity} %`
+      Humidity: ${data.list[i].main.humidity} %`);
+
+      day5img.prepend(
+        `<img src="https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png" class = "card-img-top-5"/>`
       );
 
-      day5img.prepend(`<img src="https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}@2x.png" class = "card-img-top-5"/>`)
-        
-      
-      day5title.text(data.list[i].dt_txt)
-
+      day5title.text(data.list[i].dt_txt);
     }
   }
-
-
-
-  
 }
 
 function addList() {
+  storedPlaces.push(`${city.val()}`);
 
-  var list = $('<li class = "list-group-item">')
-  list.text(city.val())
+  console.log(storedPlaces);
 
-  listGroup.append(list)
+  localStorage.setItem(`Places`, storedPlaces);
 
+  var list = $('<li class = "list-group-item">');
+  list.text(city.val());
+
+  listGroup.append(list);
 }
 
-$(".list-group").on("click", function(event) {
+$(".list-group").on("click", function (event) {
+  console.log(document.querySelectorAll(".active").length > 0);
 
-
-  console.log(document.querySelectorAll(".active").length>0)
-
-  if (document.querySelectorAll(".active").length>0) {
-    $(".active").toggleClass("active")
+  if (document.querySelectorAll(".active").length > 0) {
+    $(".active").toggleClass("active");
   }
-  
-  $(event.target).toggleClass("active")
 
-  city.val($(event.target).text())
-  getWeather2()
-})
+  $(event.target).toggleClass("active");
 
+  city.val($(event.target).text());
+  getWeather2();
+});
+
+function GetListStorage() {
+  if (localStorage.getItem("Places") != null) {
+    storedPlaces = localStorage.getItem("Places").split(",");
+    console.log(storedPlaces);
+    for (i = 0; i < storedPlaces.length; i++) {
+      var list = $('<li class = "list-group-item">');
+      list.text(storedPlaces[i]);
+      listGroup.append(list);
+    }
+  }
+}
